@@ -265,35 +265,56 @@ const Dashboard = () => {
         <div className="container mx-auto">
           {/* Responsive Header */}
           <header className="bg-white p-4 shadow-md">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-black">
-                Product Management System
-              </h1>
-              {/* Toggle button shown only on mobile */}
-              <button
-                className="md:hidden text-blue-500 focus:outline-none"
-                onClick={() => setShowHeaderContent(!showHeaderContent)}
-              >
-                {showHeaderContent ? <X /> : <Menu />}
-              </button>
-            </div>
-            {showHeaderContent && (
-              <div className="mt-4 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-                <input
-                  type="text"
-                  placeholder="Search Products..."
-                  className="flex-1 text-gray-500 p-2 px-4 border text-sm border-gray-300 rounded focus:outline-none focus:ring-0"
-                  onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-                />
-                <button
-                  className="bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
-                  onClick={() => openModal()}
-                >
-                  Add Product
-                </button>
-              </div>
-            )}
-          </header>
+  <div className="flex items-center justify-between">
+    {/* Always visible title */}
+    <h1 className="text-2xl font-bold text-black">
+      Product Management System
+    </h1>
+
+    {/* Search input and add button shown on big screens (sm and up) */}
+    <div className="hidden sm:flex items-center space-x-4">
+      <input
+        type="text"
+        placeholder="Search Products..."
+        className="flex-1 text-gray-500 p-2 px-4 border text-sm border-gray-300 rounded focus:outline-none focus:ring-0"
+        onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+      />
+      <button
+        className="bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
+        onClick={openModal}
+      >
+        Add Product
+      </button>
+    </div>
+
+    {/* Toggle button visible only on mobile */}
+    <button
+      className="sm:hidden text-blue-500 focus:outline-none"
+      onClick={() => setShowHeaderContent(!showHeaderContent)}
+    >
+      {showHeaderContent ? <X /> : <Menu />}
+    </button>
+  </div>
+
+  {/* On mobile: Show search input and add button when toggle is active */}
+  {showHeaderContent && (
+    <div className="mt-4 flex flex-col items-center space-y-4 sm:hidden">
+      <input
+        type="text"
+        placeholder="Search Products..."
+        className="w-full text-gray-500 p-2 px-4 border text-sm border-gray-300 rounded focus:outline-none focus:ring-0"
+        onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+      />
+      <button
+        className="w-full bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
+        onClick={openModal}
+      >
+        Add Product
+      </button>
+    </div>
+  )}
+</header>
+
 
           {/* Product List (Responsive Grid: 1 col on mobile, more on larger screens) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
