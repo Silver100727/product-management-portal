@@ -1,15 +1,16 @@
 import axios from "axios";
+import { Menu, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const BaseUrl = "https://api.rsgratitudegifts.com/api/addproduct";
 const initialFormData = {
   title: "",
   description: "",
-  category: "", // Added product type field
+  category: "",
   price: "",
   features: [],
   imageLinks: [],
-  specification: {}, // Kept as an object
+  specification: {},
   isLive: false,
 };
 
@@ -20,18 +21,19 @@ const Dashboard = () => {
   const [editIndex, setEditIndex] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const [imageLinkInput, setImageLinkInput] = useState("");
-  // States for handling new feature input and new specification key/value inputs.
   const [featureInput, setFeatureInput] = useState("");
   const [specKeyInput, setSpecKeyInput] = useState("");
   const [specValueInput, setSpecValueInput] = useState("");
+  // State for toggling header content on mobile
+  const [showHeaderContent, setShowHeaderContent] = useState(false);
 
   // Open the modal to add or edit a product.
   const openModal = (id) => {
     setIsModalOpen(true);
     setEditIndex(id);
     if (id) {
-      products.find((item) => item._id == id);
-      setFormData(products.find((item) => item._id == id));
+      const product = products.find((item) => item._id == id);
+      setFormData(product);
     } else {
       setFormData(initialFormData);
     }
@@ -46,7 +48,7 @@ const Dashboard = () => {
     setEditIndex(null);
   };
 
-  // For text inputs (title, type, description, price).
+  // Handle text input changes.
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
@@ -90,7 +92,7 @@ const Dashboard = () => {
     });
   };
 
-  // SPECIFICATIONS - Modified for object state.
+  // SPECIFICATIONS
   const handleAddSpecification = () => {
     if (specKeyInput.trim() === "" || specValueInput.trim() === "") return;
     setFormData({
@@ -113,7 +115,7 @@ const Dashboard = () => {
     });
   };
 
-  // Handle product add/edit form submission.
+  // Form submission for add/edit.
   const handleSubmit = (e) => {
     e.preventDefault();
     if (editIndex == null) {
@@ -129,7 +131,7 @@ const Dashboard = () => {
       .post(
         BaseUrl,
         {
-          type: "add", //add - update - delete - get
+          type: "add",
           title: formData.title,
           category: formData.category,
           description: formData.description,
@@ -151,11 +153,11 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
+
   const UpdateProdutToDb = () => {
     axios
       .post(
         BaseUrl,
-
         {
           type: "update",
           id: formData._id,
@@ -180,12 +182,13 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
+
   const fetchProdutFromDb = () => {
     axios
       .post(
         BaseUrl,
         {
-          type: "get", //add - update - delete - get
+          type: "get",
         },
         {
           headers: {
@@ -201,11 +204,11 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
+
   const DeleteProdutFromDb = (id) => {
     axios
       .post(
         BaseUrl,
-
         {
           type: "delete",
           id,
@@ -227,7 +230,6 @@ const Dashboard = () => {
     axios
       .post(
         BaseUrl,
-
         {
           type: "update",
           id: p._id,
@@ -259,33 +261,42 @@ const Dashboard = () => {
 
   return (
     <>
-      {localStorage.getItem("signIn") == "true" && (
+      {localStorage.getItem("signIn") === "true" && (
         <div className="container mx-auto">
-          {/* Header */}
-          <header className="flex items-center bg-white py-4 px-4  space-x-4">
-            <h1 className="text-2xl font-bold text-black whitespace-nowrap">
-              Product Management System
-            </h1>
-
-            <input
-              type="text"
-              placeholder="Search Products..."
-              className="flex-1 text-gray-500 p-2 px-4 border text-sm border-gray-300 rounded focus:outline-none focus:ring-0"
-              onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
-            />
-
-            <button
-              className="bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
-              onClick={() => openModal()}
-            >
-              Add Product
-            </button>
+          {/* Responsive Header */}
+          <header className="bg-white p-4 shadow-md">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-black">
+                Product Management System
+              </h1>
+              {/* Toggle button shown only on mobile */}
+              <button
+                className="md:hidden text-blue-500 focus:outline-none"
+                onClick={() => setShowHeaderContent(!showHeaderContent)}
+              >
+                {showHeaderContent ? <X /> : <Menu />}
+              </button>
+            </div>
+            {showHeaderContent && (
+              <div className="mt-4 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                <input
+                  type="text"
+                  placeholder="Search Products..."
+                  className="flex-1 text-gray-500 p-2 px-4 border text-sm border-gray-300 rounded focus:outline-none focus:ring-0"
+                  onChange={(e) => setSearchTerm(e.target.value.toLowerCase())}
+                />
+                <button
+                  className="bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
+                  onClick={() => openModal()}
+                >
+                  Add Product
+                </button>
+              </div>
+            )}
           </header>
 
-          {/* Search Input */}
-
-          {/* Product List */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+          {/* Product List (Responsive Grid: 1 col on mobile, more on larger screens) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
             {products
               .filter(
                 (product) =>
@@ -297,45 +308,34 @@ const Dashboard = () => {
                   className="max-w-auto h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col"
                   key={product._id}
                 >
-                  {/* Card Header (Static) */}
-                  <div className="bg-blue-500 text-white px-4 py-3 flex space-x-13">
-                    <h1 className="text-lg font-bold capitalize">          
+                  {/* Card Header */}
+                  <div className="bg-blue-500 text-white px-4 py-3 flex justify-between items-center">
+                    <h1 className="text-lg font-bold capitalize">
                       {product.title}
                     </h1>
-
                     <div className="flex space-x-2">
                       <button
-                        className="flex-1 bg-red-500 hover:bg-red-400 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer"
-                        onClick={() => {
-                          DeleteProdutFromDb(product._id);
-                        }}
+                        className="bg-red-500 hover:bg-red-400 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer"
+                        onClick={() => DeleteProdutFromDb(product._id)}
                       >
                         Delete
                       </button>
                       <button
-                        className="flex-1 bg-gray-700 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer"
-                        onClick={() => {
-                          openModal(product._id);
-                        }}
+                        className="bg-gray-700 hover:bg-gray-500 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer"
+                        onClick={() => openModal(product._id)}
                       >
                         Edit
                       </button>
                     </div>
                   </div>
-
-                  {/* Scrollable Card Body */}
+                  {/* Card Body */}
                   <div className="px-4 py-3 overflow-y-auto flex-1">
-                    {/* Category */}
                     <p className="text-gray-700 text-sm mb-2">
                       <strong>Category:</strong> {product.category}
                     </p>
-
-                    {/* Description */}
                     <p className="text-gray-700 text-sm mb-4">
                       <strong>Description:</strong> {product.description}
                     </p>
-
-                    {/* Product Features */}
                     <div className="mb-4">
                       <p className="font-bold mb-2 text-sm">
                         Product Features:
@@ -346,8 +346,6 @@ const Dashboard = () => {
                         ))}
                       </ul>
                     </div>
-
-                    {/* Product Specifications */}
                     <div className="mb-4">
                       <p className="font-bold mb-2 text-sm">
                         Product Specifications:
@@ -363,13 +361,9 @@ const Dashboard = () => {
                         )}
                       </div>
                     </div>
-
-                    {/* Product Price */}
                     <p className="text-gray-700 text-sm mb-4">
                       <strong>Price:</strong> {product.price}
                     </p>
-
-                    {/* Image Gallery with Horizontal Scroll */}
                     <div className="mb-4">
                       <p className="font-bold mb-2 text-sm">Image Gallery:</p>
                       <div className="flex space-x-2 overflow-x-auto">
@@ -384,38 +378,30 @@ const Dashboard = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Card Footer (Static) */}
-                  <div className="bg-gray-100 px-4 py-3 flex space-x-4">
+                  {/* Card Footer */}
+                  <div className="bg-gray-100 px-4 py-3">
                     <button
-                      className="flex-1 bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer"
-                      onClick={() => {
-                        if (product.isLive == true) {
-                          makeProductLiveorUnliveProdutToDb({
-                            ...product,
-                            isLive: false,
-                          });
-                        } else {
-                          makeProductLiveorUnliveProdutToDb({
-                            ...product,
-                            isLive: true,
-                          });
-                        }
-                      }}
+                      className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer w-full"
+                      onClick={() =>
+                        makeProductLiveorUnliveProdutToDb({
+                          ...product,
+                          isLive: !product.isLive,
+                        })
+                      }
                     >
-                      {product.isLive == true ? "UnLive" : "Live"}
+                      {product.isLive ? "UnLive" : "Live"}
                     </button>
                   </div>
                 </div>
               ))}
           </div>
 
-          {/* Modal for Add/Edit */}
+          {/* Modal for Add/Edit Product */}
           {isModalOpen && (
             <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center overflow-y-auto">
               <div className="bg-white p-6 rounded-lg max-w-[90vw] max-h-[90vh] overflow-y-auto">
                 <h2 className="text-xl font-bold mb-4">
-                  {editIndex == null ? "Add Product" : " Edit Product"}
+                  {editIndex == null ? "Add Product" : "Edit Product"}
                 </h2>
                 <form className="text-wrap" onSubmit={handleSubmit}>
                   {/* Product Title */}
@@ -436,11 +422,10 @@ const Dashboard = () => {
                       required
                     />
                   </div>
-
-                  {/* Product Type */}
+                  {/* Category */}
                   <div className="mb-4">
                     <label
-                      htmlFor="type"
+                      htmlFor="category"
                       className="block text-gray-700 text-sm"
                     >
                       Category
@@ -455,12 +440,11 @@ const Dashboard = () => {
                       required
                     />
                   </div>
-
-                  {/* Product Description */}
+                  {/* Description */}
                   <div className="mb-4">
                     <label
                       htmlFor="description"
-                      className="block text-gray-700 text-sm "
+                      className="block text-gray-700 text-sm"
                     >
                       Product Description
                     </label>
@@ -473,8 +457,7 @@ const Dashboard = () => {
                       required
                     />
                   </div>
-
-                  {/* Product Features as List */}
+                  {/* Features */}
                   <div className="mb-4">
                     <label className="block text-gray-700 text-sm">
                       Product Features
@@ -515,8 +498,7 @@ const Dashboard = () => {
                       </ul>
                     )}
                   </div>
-
-                  {/* Product Specification as Object */}
+                  {/* Specifications */}
                   <div className="mb-4">
                     <label className="block text-gray-700 text-sm">
                       Product Specification
@@ -544,8 +526,6 @@ const Dashboard = () => {
                         +
                       </button>
                     </div>
-
-                    {/* Display specifications from object */}
                     {Object.keys(formData.specification).length > 0 && (
                       <ul className="list-disc ml-5">
                         {Object.entries(formData.specification).map(
@@ -570,8 +550,7 @@ const Dashboard = () => {
                       </ul>
                     )}
                   </div>
-
-                  {/* Product Price */}
+                  {/* Price */}
                   <div className="mb-4">
                     <label
                       htmlFor="price"
@@ -589,8 +568,7 @@ const Dashboard = () => {
                       required
                     />
                   </div>
-
-                  {/* Multiple Image Links */}
+                  {/* Image Links */}
                   <div className="mb-4">
                     <label className="block text-gray-700 text-sm">
                       Image Links
@@ -611,8 +589,6 @@ const Dashboard = () => {
                         +
                       </button>
                     </div>
-
-                    {/* Image Preview */}
                     {imageLinkInput && (
                       <div className="mb-4">
                         <p className="text-gray-700 mb-2">Image Preview:</p>
@@ -621,13 +597,11 @@ const Dashboard = () => {
                           alt="Preview"
                           className="max-h-40 object-contain border p-1"
                           onError={(e) => {
-                            // Optionally, handle image load errors (e.g., reset preview)
                             e.target.src = "";
                           }}
                         />
                       </div>
                     )}
-
                     {formData.imageLinks && formData.imageLinks.length > 0 && (
                       <ul className="list-disc ml-5">
                         {formData.imageLinks.map((link, index) => (
@@ -647,7 +621,6 @@ const Dashboard = () => {
                       </ul>
                     )}
                   </div>
-
                   {/* Modal Buttons */}
                   <div className="flex justify-end">
                     <button
