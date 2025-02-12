@@ -324,7 +324,7 @@ const Dashboard = () => {
               )
               .map((product) => (
                 <div
-                  className="max-w-auto h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col"
+                  className="min-w-[300px] max-w-[300px] h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col"
                   key={product._id}
                 >
                   {/* Card Header */}
