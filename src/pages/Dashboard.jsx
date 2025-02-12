@@ -276,7 +276,9 @@ const Dashboard = () => {
                 />
                 <button
                   className="bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
-                  onClick={openModal}
+                  onClick={() => {
+                    openModal(null);
+                  }}
                 >
                   Add Product
                 </button>
@@ -302,7 +304,9 @@ const Dashboard = () => {
                 />
                 <button
                   className="w-full bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
-                  onClick={openModal}
+                  onClick={() => {
+                    openModal(null);
+                  }}
                 >
                   Add Product
                 </button>
@@ -396,7 +400,7 @@ const Dashboard = () => {
                   {/* Card Footer */}
                   <div className="bg-gray-100 px-4 py-3">
                     <button
-                      className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded text-sm cursor-pointer w-full"
+                      className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
                       onClick={() =>
                         makeProductLiveorUnliveProdutToDb({
                           ...product,
@@ -404,7 +408,7 @@ const Dashboard = () => {
                         })
                       }
                     >
-                      {product.isLive ? "UnLive" : "Live"}
+                      {product.isLive ? "UNLIVE" : "LIVE"}
                     </button>
                   </div>
                 </div>
@@ -438,6 +442,7 @@ const Dashboard = () => {
                     />
                   </div>
                   {/* Category */}
+                  {/* Category */}
                   <div className="mb-4">
                     <label
                       htmlFor="category"
@@ -445,16 +450,23 @@ const Dashboard = () => {
                     >
                       Category
                     </label>
-                    <input
-                      type="text"
+                    <select
                       id="category"
-                      placeholder="Category..."
                       value={formData.category}
                       onChange={handleInputChange}
                       className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
                       required
-                    />
+                    >
+                      <option value="">Select a category...</option>
+                      <option value="T-shirt">T-shirt</option>
+                      <option value="Shirt">Shirt</option>
+                      <option value="Phone">Phone</option>
+                      <option value="Pants">Pants</option>
+                      <option value="Jeans">Jeans</option>
+                      {/* Add more options as needed */}
+                    </select>
                   </div>
+
                   {/* Description */}
                   <div className="mb-4">
                     <label
