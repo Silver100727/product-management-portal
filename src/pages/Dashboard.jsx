@@ -330,7 +330,7 @@ const Dashboard = () => {
                 )
                 .map((product) => (
                   <div
-                    className="min-w-[300px] max-w-[300px] h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col z-10"
+                    className="min-w-[300px] max-w-[300px] max-sm:min-w-[350px] max-sm:max-w-[350px] h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col z-10"
                     key={product._id}
                   >
                     {/* Card Header */}
