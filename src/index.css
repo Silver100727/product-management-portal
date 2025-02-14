@@ -1,5 +1,4 @@
 @import "./asset/fonts/SanFrancisco/sanfrancisco_font.css";
-
 @import "tailwindcss";
 
 @layer base {
@@ -7,7 +6,6 @@
     font-family: "SF Pro Display" !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: rgb(7, 25, 77);
   }
   *::-webkit-scrollbar {
     display: none !important;
