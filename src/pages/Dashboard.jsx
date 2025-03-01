@@ -1,8 +1,8 @@
 import axios from "axios";
-import { Menu, Trash, UserRoundPen, X } from "lucide-react";
+import { Menu, Trash, UserRoundPen, X, XIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-const BaseUrl = "https://api.rsgratitudegifts.com/api/addproduct";
+const BaseUrl = "https://rsgratitudegifts.com/api/routes.php?action=addproduct";
 const initialFormData = {
   title: "",
   description: "",
@@ -423,11 +423,14 @@ const Dashboard = () => {
 
             {/* Modal for Add/Edit Product */}
             {isModalOpen && (
-              <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center overflow-y-auto">
+              <div className="fixed inset-0 bg-gray-800/50 flex items-center z-40 justify-center overflow-y-auto">
                 <div className="bg-white p-6 rounded-lg max-w-[90vw] max-h-[90vh] overflow-y-auto">
-                  <h2 className="text-xl font-bold mb-4">
-                    {editIndex == null ? "Add Product" : "Edit Product"}
-                  </h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold mb-4">
+                      {editIndex == null ? "Add Product" : "Edit Product"}
+                    </h2>
+                    <XIcon onClick={closeModal} className="cursor-pointer" />
+                  </div>
                   <form className="text-wrap" onSubmit={handleSubmit}>
                     {/* Product Title */}
                     <div className="mb-4">
