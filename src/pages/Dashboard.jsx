@@ -644,7 +644,7 @@ const Dashboard = () => {
                             {formData.imageLinks.map((link, index) => (
                               <li key={index} className="text-blue-500">
                                 <div className="flex items-center justify-between w-50">
-                                  <p className="text-blue-500 text-wrap">
+                                  <p className="text-blue-500 w-50 truncate">
                                     {link}
                                   </p>
                                   <button
