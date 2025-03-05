@@ -3,6 +3,9 @@ import { Menu, Trash, UserRoundPen, X, XIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const BaseUrl = "https://rsgratitudegifts.com/api/routes.php?action=addproduct";
+const UploadURL =
+  "https://rsgratitudegifts.com/api/routes.php?action=upload_image";
+
 const initialFormData = {
   title: "",
   description: "",
@@ -250,6 +253,41 @@ const Dashboard = () => {
       .catch((err) => {});
   };
 
+  const fileUpload = async (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file, file.name);
+    await axios
+      .post(
+        "https://rsgratitudegifts.com/api/routes.php?action=upload_image",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.success) {
+          if (res.data.fileURL.trim() === "") return;
+          setFormData((prevData) => ({
+            ...prevData,
+            imageLinks: [
+              ...(prevData.imageLinks || []),
+              res.data.fileURL.trim(),
+            ],
+          }));
+          event.target.value = "";
+        } else {
+          event.target.value = "";
+        }
+      })
+      .catch((err) => {
+        event.target.value = "";
+      });
+  };
+
   useEffect(() => {
     fetchProdutFromDb();
   }, []);
@@ -451,7 +489,6 @@ const Dashboard = () => {
                       />
                     </div>
                     {/* Category */}
-                    {/* Category */}
                     <div className="mb-4">
                       <label
                         htmlFor="category"
@@ -605,46 +642,38 @@ const Dashboard = () => {
                       />
                     </div>
                     {/* Image Links */}
+
+                    {/* Image Upload */}
                     <div className="mb-4">
                       <label className="block text-gray-700 text-sm">
-                        Image Links
+                        Upload Image
                       </label>
-                      <div className="flex mb-2">
+                      <div className="flex items-center">
                         <input
-                          type="text"
-                          value={imageLinkInput}
-                          onChange={handleImageLinkInputChange}
-                          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-0"
-                          placeholder="Enter image URL..."
+                          type="file"
+                          accept="image/*"
+                          id="fileInput"
+                          onChange={fileUpload}
+                          className="hidden" // Hide default file input
                         />
                         <button
                           type="button"
-                          onClick={handleAddImageLink}
-                          className="bg-green-500 text-white text-sm px-2 py-2 rounded ml-2 cursor-pointer"
+                          onClick={() =>
+                            document.getElementById("fileInput").click()
+                          }
+                          className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
                         >
-                          +
+                          Choose File
                         </button>
                       </div>
-                      {imageLinkInput && (
-                        <div className="mb-4">
-                          <p className="text-gray-700 mb-2">Image Preview:</p>
-                          <img
-                            src={imageLinkInput}
-                            alt="Preview"
-                            className="max-h-40 object-contain border p-1"
-                            onError={(e) => {
-                              e.target.src = "";
-                            }}
-                          />
-                        </div>
-                      )}
+
                       {formData.imageLinks &&
                         formData.imageLinks.length > 0 && (
                           <ul className="list-disc ml-5">
                             {formData.imageLinks.map((link, index) => (
                               <li key={index} className="text-blue-500">
-                                <div className="flex items-center justify-between w-50">
-                                  <p className="text-blue-500 w-50 truncate">
+                                <div className="flex items-center justify-between w-[350px]">
+                                  <p className="text-blue-500 w-full truncate">
                                     {link}
                                   </p>
                                   <button
@@ -660,6 +689,7 @@ const Dashboard = () => {
                           </ul>
                         )}
                     </div>
+
                     {/* Modal Buttons */}
                     <div className="flex justify-end">
                       <button
