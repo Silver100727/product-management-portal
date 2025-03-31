@@ -529,6 +529,8 @@ const Dashboard = () => {
                         <option value="Jeans">Luggage</option>
                         <option value="Jeans">Trophies</option>
                         <option value="Jeans">Drinkware & Kitchenware</option>
+                        <option value="Jeans">Festival</option>
+                        <option value="Jeans">Corporate Gift</option>
                         <option value="Jeans">Personalized & Custom Gifts</option>
                         <option value="Jeans">Others</option>
                       </select>
