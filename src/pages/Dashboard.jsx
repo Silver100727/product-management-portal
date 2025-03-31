@@ -15,6 +15,7 @@ const initialFormData = {
   imageLinks: [],
   specification: {},
   isLive: false,
+  isTrending: false,
 };
 
 const Dashboard = () => {
@@ -143,6 +144,7 @@ const Dashboard = () => {
           price: formData.price,
           imageLinks: formData.imageLinks,
           isLive: false,
+          isTrending: false,
         },
         {
           headers: {
@@ -171,6 +173,7 @@ const Dashboard = () => {
           price: formData.price,
           imageLinks: formData.imageLinks,
           isLive: true,
+          isTrending: false,
         },
         {
           headers: {
@@ -240,6 +243,7 @@ const Dashboard = () => {
           price: p.price,
           imageLinks: p.imageLinks,
           isLive: p.isLive,
+          isTrending: p.isTrending,
         },
         {
           headers: {
@@ -442,7 +446,7 @@ const Dashboard = () => {
                       </div>
                     </div>
                     {/* Card Footer */}
-                    <div className="bg-gray-100 px-4 py-3">
+                    <div className="bg-gray-100 flex gap-2 px-4 py-3">
                       <button
                         className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
                         onClick={() =>
@@ -453,6 +457,18 @@ const Dashboard = () => {
                         }
                       >
                         {product.isLive ? "UNLIVE" : "LIVE"}
+                      </button>
+
+                      <button
+                        className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
+                        onClick={() =>
+                          makeProductLiveorUnliveProdutToDb({
+                            ...product,
+                            isTrending: !product.isTrending,
+                          })
+                        }
+                      >
+                        {product.isTrending ? "Trending" : "Not in Trending"}
                       </button>
                     </div>
                   </div>
