@@ -522,10 +522,15 @@ const Dashboard = () => {
                         <option value="">Select a category...</option>
                         <option value="T-shirt">T-shirt</option>
                         <option value="Shirt">Shirt</option>
-                        <option value="Phone">Phone</option>
                         <option value="Pants">Pants</option>
                         <option value="Jeans">Jeans</option>
-                        {/* Add more options as needed */}
+                        <option value="Jeans">Electronic Gadgets</option>
+                        <option value="Jeans">Track Suit</option>
+                        <option value="Jeans">Luggage</option>
+                        <option value="Jeans">Trophies</option>
+                        <option value="Jeans">Drinkware & Kitchenware</option>
+                        <option value="Jeans">Personalized & Custom Gifts</option>
+                        <option value="Jeans">Others</option>
                       </select>
                     </div>
 
