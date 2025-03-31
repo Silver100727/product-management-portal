@@ -524,15 +524,15 @@ const Dashboard = () => {
                         <option value="Shirt">Shirt</option>
                         <option value="Pants">Pants</option>
                         <option value="Jeans">Jeans</option>
-                        <option value="Jeans">Electronic Gadgets</option>
-                        <option value="Jeans">Track Suit</option>
-                        <option value="Jeans">Luggage</option>
-                        <option value="Jeans">Trophies</option>
-                        <option value="Jeans">Drinkware & Kitchenware</option>
-                        <option value="Jeans">Festival</option>
-                        <option value="Jeans">Corporate Gift</option>
-                        <option value="Jeans">Personalized & Custom Gifts</option>
-                        <option value="Jeans">Others</option>
+                        <option value="Electronic Gadgets">Electronic Gadgets</option>
+                        <option value="Track Suit">Track Suit</option>
+                        <option value="Luggage">Luggage</option>
+                        <option value="Trophies">Trophies</option>
+                        <option value="Drinkware & Kitchenware">Drinkware & Kitchenware</option>
+                        <option value="Festival">Festival</option>
+                        <option value="Corporate Gift">Corporate Gift</option>
+                        <option value="Personalized & Custom Gifts">Personalized & Custom Gifts</option>
+                        <option value="Others">Others</option>
                       </select>
                     </div>
 
