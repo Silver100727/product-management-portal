@@ -19,7 +19,7 @@ const initialFormData = {
 };
 
 const Dashboard = () => {
-  const [products, setProducts] = useState([]);
+  const [groupedProducts, setgroupedProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -36,8 +36,11 @@ const Dashboard = () => {
     setIsModalOpen(true);
     setEditIndex(id);
     if (id) {
-      const product = products.find((item) => item._id == id);
-      setFormData(product);
+      const flatProducts = Object.values(groupedProducts)
+        .flatMap((products) => products)
+        .find((item) => item._id == id);
+      console.log(flatProducts);
+      setFormData(flatProducts);
     } else {
       setFormData(initialFormData);
     }
@@ -202,7 +205,17 @@ const Dashboard = () => {
       )
       .then((res) => {
         if (res.data.success) {
-          setProducts(res.data.data);
+          const products = res.data.data;
+          const groupedProducts = products.reduce((acc, product) => {
+            if (!acc[product.category]) {
+              acc[product.category] = [];
+            }
+            acc[product.category].push(product);
+            return acc;
+          }, {});
+
+          console.log("groupedProducts", groupedProducts);
+          setgroupedProducts(groupedProducts);
         }
       })
       .catch((err) => {});
@@ -223,7 +236,7 @@ const Dashboard = () => {
         }
       )
       .then((res) => {
-        setProducts(products.filter((product) => product._id !== id));
+        fetchProdutFromDb();
       })
       .catch((err) => {});
   };
@@ -301,7 +314,6 @@ const Dashboard = () => {
       {localStorage.getItem("signIn") === "true" && (
         <div className="relative h-screen bg-slate-950 ">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]" />
-
           <div className="h-full w-full absolute overflow-y-auto scroll-smooth">
             <header className=" bg-white sticky top-0 p-4 shadow-md z-20">
               <div className="flex items-center justify-between">
@@ -363,122 +375,132 @@ const Dashboard = () => {
             </header>
 
             {/* Product List (Responsive Grid: 1 col on mobile, more on larger screens) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-8">
-              {products
-                .filter(
-                  (product) =>
-                    product.title.toLowerCase().includes(searchTerm) ||
-                    product.description.toLowerCase().includes(searchTerm)
-                )
-                .map((product) => (
-                  <div
-                    className="min-w-[300px] max-w-[300px] max-sm:min-w-[350px] max-sm:max-w-[350px] h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col z-10"
-                    key={product._id}
-                  >
-                    {/* Card Header */}
-                    <div className="bg-blue-500 text-white px-4 py-3 flex justify-between items-center">
-                      <h1 className="text-lg font-bold capitalize">
-                        {product.title}
-                      </h1>
-                      <div className="flex space-x-2">
-                        <button
-                          className="DeleteButton"
-                          onClick={() => DeleteProdutFromDb(product._id)}
-                        >
-                          <Trash size={15} />
-                        </button>
-                        <button
-                          className="EditButton"
-                          onClick={() => openModal(product._id)}
-                        >
-                          <UserRoundPen size={15} />
-                        </button>
-                      </div>
-                    </div>
-                    {/* Card Body */}
-                    <div className="px-4 py-3 overflow-y-auto flex-1">
-                      <p className="text-gray-700 text-sm mb-2">
-                        <strong>Category:</strong> {product.category}
-                      </p>
-                      <p className="text-gray-700 text-sm mb-4">
-                        <strong>Description:</strong> {product.description}
-                      </p>
-                      <div className="mb-4">
-                        <p className="font-bold mb-2 text-sm">
-                          Product Features:
-                        </p>
-                        <ul className="list-disc list-inside text-xs">
-                          {product.features.map((feature, index) => (
-                            <li key={index}>{feature}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="mb-4">
-                        <p className="font-bold mb-2 text-sm">
-                          Product Specifications:
-                        </p>
-                        <div className="grid grid-cols-2 gap-1 text-xs">
-                          {Object.entries(product.specification).map(
-                            ([specKey, specValue], index) => (
-                              <React.Fragment key={index}>
-                                <div className="font-semibold">{specKey}</div>
-                                <div>{specValue}</div>
-                              </React.Fragment>
-                            )
-                          )}
-                        </div>
-                      </div>
-                      <p className="text-gray-700 text-sm mb-4">
-                        <strong>Price:</strong> {product.price}
-                      </p>
-                      <div className="mb-4">
-                        <p className="font-bold mb-2 text-sm">Image Gallery:</p>
-                        <div className="flex space-x-2 overflow-x-auto">
-                          {product.imageLinks.map((link, index) => (
-                            <img
-                              key={index}
-                              src={link}
-                              alt={`${product.title} image ${index + 1}`}
-                              className="object-cover w-16 h-16 rounded"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    {/* Card Footer */}
-                    <div className="bg-gray-100 flex gap-2 px-4 py-3">
-                      <button
-                        className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
-                        onClick={() =>
-                          makeProductLiveorUnliveProdutToDb({
-                            ...product,
-                            isLive: !product.isLive,
-                          })
-                        }
+            {Object.entries(groupedProducts).map(([category], index) => (
+              <div key={category} className="border p-4 rounded-lg shadow">
+                <h3 className="text-4xl mb-5 font-semibold text-white">
+                  {index + 1} . {category} :
+                </h3>
+                <div className="grid gap-y-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
+                  {groupedProducts[category]
+                    .filter(
+                      (product) =>
+                        product.title.toLowerCase().includes(searchTerm) ||
+                        product.description.toLowerCase().includes(searchTerm)
+                    )
+                    .map((product) => (
+                      <div
+                        className="min-w-[300px] max-w-[300px] max-sm:min-w-[350px] max-sm:max-w-[350px] h-96 mx-auto bg-white rounded-xl shadow-md overflow-hidden flex flex-col z-10"
+                        key={product._id}
                       >
-                        {product.isLive ? "UNLIVE" : "LIVE"}
-                      </button>
+                        <div className="bg-blue-500 text-white px-4 py-3 flex justify-between items-center">
+                          <h1 className="text-lg font-bold capitalize">
+                            {product.title}
+                          </h1>
+                          <div className="flex space-x-2">
+                            <button
+                              className="DeleteButton"
+                              onClick={() => DeleteProdutFromDb(product._id)}
+                            >
+                              <Trash size={15} />
+                            </button>
+                            <button
+                              className="EditButton"
+                              onClick={() => openModal(product._id)}
+                            >
+                              <UserRoundPen size={15} />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="px-4 py-3 overflow-y-auto flex-1">
+                          <p className="text-gray-700 text-sm mb-2">
+                            <strong>Category:</strong> {product.category}
+                          </p>
+                          <p className="text-gray-700 text-sm mb-4">
+                            <strong>Description:</strong> {product.description}
+                          </p>
+                          <div className="mb-4">
+                            <p className="font-bold mb-2 text-sm">
+                              Product Features:
+                            </p>
+                            <ul className="list-disc list-inside text-xs">
+                              {product.features.map((feature, index) => (
+                                <li key={index}>{feature}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div className="mb-4">
+                            <p className="font-bold mb-2 text-sm">
+                              Product Specifications:
+                            </p>
+                            <div className="grid grid-cols-2 gap-1 text-xs">
+                              {Object.entries(product.specification).map(
+                                ([specKey, specValue], index) => (
+                                  <React.Fragment key={index}>
+                                    <div className="font-semibold">
+                                      {specKey}
+                                    </div>
+                                    <div>{specValue}</div>
+                                  </React.Fragment>
+                                )
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-gray-700 text-sm mb-4">
+                            <strong>Price:</strong> {product.price}
+                          </p>
+                          <div className="mb-4">
+                            <p className="font-bold mb-2 text-sm">
+                              Image Gallery:
+                            </p>
+                            <div className="flex space-x-2 overflow-x-auto">
+                              {product.imageLinks.map((link, index) => (
+                                <img
+                                  key={index}
+                                  src={link}
+                                  alt={`${product.title} image ${index + 1}`}
+                                  className="object-cover w-16 h-16 rounded"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-gray-100 flex gap-2 px-4 py-3">
+                          <button
+                            className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
+                            onClick={() =>
+                              makeProductLiveorUnliveProdutToDb({
+                                ...product,
+                                isLive: !product.isLive,
+                              })
+                            }
+                          >
+                            {product.isLive ? "UNLIVE" : "LIVE"}
+                          </button>
 
-                      <button
-                        className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
-                        onClick={() =>
-                          makeProductLiveorUnliveProdutToDb({
-                            ...product,
-                            isTrending: !product.isTrending,
-                          })
-                        }
-                      >
-                        {product.isTrending ? "Trending" : "Not in Trending"}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-            </div>
+                          <button
+                            className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
+                            onClick={() =>
+                              makeProductLiveorUnliveProdutToDb({
+                                ...product,
+                                isTrending: !product.isTrending,
+                              })
+                            }
+                          >
+                            {product.isTrending
+                              ? "Trending"
+                              : "Not in Trending"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            ))}
 
             {/* Modal for Add/Edit Product */}
             {isModalOpen && (
-              <div className="fixed inset-0 bg-gray-800/50 flex items-center z-40 justify-center overflow-y-auto">
-                <div className="bg-white p-6 rounded-lg max-w-[90vw] max-h-[90vh] overflow-y-auto">
+              <div className="fixed inset-0 bg-gray-800/50 flex  items-center z-40 justify-center overflow-y-auto">
+                <div className="bg-white p-6 rounded-lg min-w-[40dvw] max-w-[40dvw] max-h-[90dvh] overflow-y-auto">
                   <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold mb-4">
                       {editIndex == null ? "Add Product" : "Edit Product"}
@@ -524,14 +546,21 @@ const Dashboard = () => {
                         <option value="Shirt">Shirt</option>
                         <option value="Pants">Pants</option>
                         <option value="Jeans">Jeans</option>
-                        <option value="Electronic Gadgets">Electronic Gadgets</option>
+                        <option value="Electronic Gadgets">
+                          Electronic Gadgets
+                        </option>
                         <option value="Track Suit">Track Suit</option>
                         <option value="Luggage">Luggage</option>
                         <option value="Trophies">Trophies</option>
-                        <option value="Drinkware & Kitchenware">Drinkware & Kitchenware</option>
+                        <option value="Trophies">Jackets</option>
+                        <option value="Drinkware & Kitchenware">
+                          Drinkware & Kitchenware
+                        </option>
                         <option value="Festival">Festival</option>
                         <option value="Corporate Gift">Corporate Gift</option>
-                        <option value="Personalized & Custom Gifts">Personalized & Custom Gifts</option>
+                        <option value="Personalized & Custom Gifts">
+                          Personalized & Custom Gifts
+                        </option>
                         <option value="Others">Others</option>
                       </select>
                     </div>
@@ -549,7 +578,7 @@ const Dashboard = () => {
                         placeholder="Product Description..."
                         value={formData.description}
                         onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
+                        className="w-full h-[100px] p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
                         required
                       />
                     </div>
