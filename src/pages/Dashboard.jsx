@@ -156,7 +156,12 @@ const Dashboard = () => {
         }
       )
       .then((res) => {
-        fetchProdutFromDb();
+        if (res.data.success) {
+          alert("Product added successfully!");
+          fetchProdutFromDb();
+        } else {
+          alert("Product already exists.");
+        }
       })
       .catch((err) => {});
   };
@@ -562,7 +567,9 @@ const Dashboard = () => {
                         <option value="Bags">Bags</option>
                         <option value="Table desk">Table desk</option>
                         <option value="Joining kits">Joining kits</option>
-                        <option value="Desktop accessories">Desktop accessories</option>
+                        <option value="Desktop accessories">
+                          Desktop accessories
+                        </option>
                         <option value="Drinkware & Kitchenware">
                           Drinkware & Kitchenware
                         </option>
