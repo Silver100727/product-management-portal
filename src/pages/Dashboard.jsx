@@ -221,7 +221,12 @@ const Dashboard = () => {
       .catch((err) => {});
   };
 
+  // ... existing code ...
   const DeleteProdutFromDb = (id) => {
+    // Show confirmation dialog before proceeding
+    if (!window.confirm("Are you sure you want to delete this product?")) {
+      return;
+    }
     axios
       .post(
         BaseUrl,
@@ -240,6 +245,7 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
+  // ... existing code ...
 
   const makeProductLiveorUnliveProdutToDb = (p) => {
     axios
@@ -552,7 +558,11 @@ const Dashboard = () => {
                         <option value="Track Suit">Track Suit</option>
                         <option value="Luggage">Luggage</option>
                         <option value="Trophies">Trophies</option>
-                        <option value="Trophies">Jackets</option>
+                        <option value="Jackets">Jackets</option>
+                        <option value="Bags">Bags</option>
+                        <option value="Table desk">Table desk</option>
+                        <option value="Joining kits">Joining kits</option>
+                        <option value="Desktop accessories">Desktop accessories</option>
                         <option value="Drinkware & Kitchenware">
                           Drinkware & Kitchenware
                         </option>
