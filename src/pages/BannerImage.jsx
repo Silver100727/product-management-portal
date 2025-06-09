@@ -49,13 +49,15 @@ const BannerImage = () => {
       });
   };
   const UpdateToDb = () => {
+    console.log("selectedBanner", selectedBanner);
     axios
       .post(
         "https://rsgratitudegifts.com/api/routes.php?action=addbanner",
         {
-          type: "updated",
-          bannerType: SelectedBanner,
-          imageList: "",
+          type: "update",
+          id: selectedBanner.banner._id,
+          banner_type: selectedBanner.banner.banner_type,
+          imageLinks: selectedBanner.banner.imageLinks,
         },
         {
           headers: {
@@ -65,10 +67,11 @@ const BannerImage = () => {
       )
       .then((res) => {
         if (res.data.success) {
-          alert("Product added successfully!");
-          fetchProdutFromDb();
+          alert("Banner added successfully!");
+          setselectedBanner({ isOpen: false, banner: null });
+          getBannerFromDb();
         } else {
-          alert("Product already exists.");
+          alert("Banner already exists.");
         }
       })
       .catch((err) => {});
@@ -148,7 +151,7 @@ const BannerImage = () => {
                   </button>
                 </div>
 
-                <div className="imageoverflow overflow-auto">
+                <div className="imageoverflow flex space-x-2 overflow-auto">
                   {banner.imageLinks.map((link, index) => (
                     <img
                       key={index}
@@ -224,25 +227,29 @@ const BannerImage = () => {
                 {selectedBanner &&
                   selectedBanner.banner.imageLinks.length > 0 && (
                     <ul className="list-disc ml-5">
-                      {selectedBanner.banner.imageLinks.map((link, index) => {
-                        console.log("link", link);
-                        return (
-                          <li key={index} className="text-blue-500">
-                            <div className="flex items-center justify-between w-[350px]">
-                              <p className="text-blue-500 w-full truncate">
-                                {link}
-                              </p>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveImageLink(index)}
-                                className="text-red-500"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          </li>
-                        );
-                      })}
+                      {selectedBanner.banner.imageLinks.map(
+                        (link, index, imageList) => {
+                          return (
+                            <li key={index} className="text-blue-500">
+                              <div className="flex items-center justify-between w-[350px]">
+                                <p className="text-blue-500 w-full truncate">
+                                  {link}
+                                </p>
+
+                                {imageList.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveImageLink(index)}
+                                    className="text-red-500"
+                                  >
+                                    Remove
+                                  </button>
+                                )}
+                              </div>
+                            </li>
+                          );
+                        }
+                      )}
                     </ul>
                   )}
               </div>

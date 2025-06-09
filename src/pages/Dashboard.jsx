@@ -336,7 +336,6 @@ const Dashboard = () => {
     getCategoryFromDb();
   }, []);
 
-  console.log("MainCategory", MainCategory);
   return (
     <>
       {localStorage.getItem("signIn") === "true" && (
