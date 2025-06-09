@@ -125,7 +125,6 @@ const Dashboard = () => {
     }
     closeModal();
   };
-
   const addProdutToDb = () => {
     axios
       .post(
@@ -158,7 +157,6 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-
   const UpdateProdutToDb = () => {
     axios
       .post(
@@ -187,7 +185,6 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-
   const fetchProdutFromDb = () => {
     axios
       .post(
@@ -218,7 +215,6 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-
   const DeleteProdutFromDb = (id) => {
     // Show confirmation dialog before proceeding
     if (!window.confirm("Are you sure you want to delete this product?")) {
@@ -242,7 +238,6 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-
   const makeProductLiveorUnliveProdutToDb = (p) => {
     axios
       .post(
@@ -271,7 +266,6 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-
   const fileUpload = async (event) => {
     event.preventDefault();
     const file = event.target.files[0];
@@ -307,10 +301,42 @@ const Dashboard = () => {
       });
   };
 
+  const getCategoryFromDb = () => {
+    axios
+      .get("https://rsgratitudegifts.com/api/routes.php?action=getcategory", {})
+      .then((res) => {
+        if (res.data.success) {
+          setMainCategory(res.data.data);
+        } else {
+          setMainCategory([]);
+        }
+      })
+      .catch((err) => {});
+  };
+  const getsubCategoryFromDb = (id) => {
+    axios
+      .post(
+        "https://rsgratitudegifts.com/api/routes.php?action=getsubcategorybycategory",
+        {
+          category_id: MainCategory.find((c) => c._id == id)?.id || "",
+        }
+      )
+      .then((res) => {
+        if (res.data.success) {
+          SubMainCategory(res.data.data);
+        } else {
+          SubMainCategory([]);
+        }
+      })
+      .catch((err) => {});
+  };
+
   useEffect(() => {
     fetchProdutFromDb();
+    getCategoryFromDb();
   }, []);
 
+  console.log("MainCategory", MainCategory);
   return (
     <>
       {localStorage.getItem("signIn") === "true" && (
@@ -410,7 +436,7 @@ const Dashboard = () => {
                 <h3 className="text-2xl mb-5 font-semibold text-white">
                   {index + 1} . {category} :
                 </h3>
-                
+
                 <div className="grid gap-y-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
                   {groupedProducts[category]
                     .filter(
@@ -539,7 +565,6 @@ const Dashboard = () => {
                     <XIcon onClick={closeModal} className="cursor-pointer" />
                   </div>
 
-
                   <form className="text-wrap" onSubmit={handleSubmit}>
                     {/* Product Title */}
                     <div className="mb-4">
@@ -569,16 +594,19 @@ const Dashboard = () => {
                         Main Category
                       </label>
                       <select
-                        id="category"
+                        id="maincategory"
                         value={formData.maincategory}
-                        onChange={handleInputChange}
+                        onChange={(e) => {
+                          handleInputChange(e);
+                          getsubCategoryFromDb(e.target.value);
+                        }}
                         className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
                         required
                       >
                         <option value="">Select a Main category...</option>
                         {MainCategory.map((category, index) => (
-                          <option key={index} value={category}>
-                            {category}
+                          <option key={index} value={category.category}>
+                            {category.category}
                           </option>
                         ))}
                       </select>
@@ -601,8 +629,8 @@ const Dashboard = () => {
                       >
                         <option value="">Select a Sub category...</option>
                         {SubCategory.map((subCat, index) => (
-                          <option key={index} value={subCat}>
-                            {subCat}
+                          <option key={index} value={subCat.subcategory}>
+                            {subCat.subcategory}
                           </option>
                         ))}
                       </select>
@@ -802,8 +830,6 @@ const Dashboard = () => {
                       </button>
                     </div>
                   </form>
-
-
                 </div>
               </div>
             )}
