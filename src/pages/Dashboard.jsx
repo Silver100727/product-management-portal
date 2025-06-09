@@ -313,12 +313,12 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-  const getsubCategoryFromDb = (id) => {
+  const getsubCategoryFromDb = (name) => {
     axios
       .post(
         "https://rsgratitudegifts.com/api/routes.php?action=getsubcategorybycategory",
         {
-          category_id: MainCategory.find((c) => c._id == id)?.id || "",
+          category_id: MainCategory.find((c) => c.category == name)?._id || "",
         }
       )
       .then((res) => {
