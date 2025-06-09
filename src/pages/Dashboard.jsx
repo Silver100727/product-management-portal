@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Menu, Trash, UserRoundPen, X, XIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const BaseUrl = "https://rsgratitudegifts.com/api/routes.php?action=addproduct";
 const UploadURL =
@@ -9,7 +10,8 @@ const UploadURL =
 const initialFormData = {
   title: "",
   description: "",
-  category: "",
+  maincategory: "",
+  subcategory: "",
   price: "",
   features: [],
   imageLinks: [],
@@ -19,6 +21,7 @@ const initialFormData = {
 };
 
 const Dashboard = () => {
+  const NavTo = useNavigate();
   const [groupedProducts, setgroupedProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,6 +31,10 @@ const Dashboard = () => {
   const [featureInput, setFeatureInput] = useState("");
   const [specKeyInput, setSpecKeyInput] = useState("");
   const [specValueInput, setSpecValueInput] = useState("");
+
+  const [MainCategory, setMainCategory] = useState([]);
+  const [SubCategory, SubMainCategory] = useState([]);
+
   // State for toggling header content on mobile
   const [showHeaderContent, setShowHeaderContent] = useState(false);
 
@@ -59,20 +66,6 @@ const Dashboard = () => {
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
-  };
-
-  // IMAGE LINKS
-  const handleImageLinkInputChange = (e) => {
-    setImageLinkInput(e.target.value);
-  };
-
-  const handleAddImageLink = () => {
-    if (imageLinkInput.trim() === "") return;
-    setFormData({
-      ...formData,
-      imageLinks: [...formData.imageLinks, imageLinkInput.trim()],
-    });
-    setImageLinkInput("");
   };
 
   const handleRemoveImageLink = (index) => {
@@ -212,10 +205,10 @@ const Dashboard = () => {
         if (res.data.success) {
           const products = res.data.data;
           const groupedProducts = products.reduce((acc, product) => {
-            if (!acc[product.category]) {
-              acc[product.category] = [];
+            if (!acc[product.subcategory]) {
+              acc[product.subcategory] = [];
             }
-            acc[product.category].push(product);
+            acc[product.subcategory].push(product);
             return acc;
           }, {});
 
@@ -226,7 +219,6 @@ const Dashboard = () => {
       .catch((err) => {});
   };
 
-  // ... existing code ...
   const DeleteProdutFromDb = (id) => {
     // Show confirmation dialog before proceeding
     if (!window.confirm("Are you sure you want to delete this product?")) {
@@ -250,7 +242,6 @@ const Dashboard = () => {
       })
       .catch((err) => {});
   };
-  // ... existing code ...
 
   const makeProductLiveorUnliveProdutToDb = (p) => {
     axios
@@ -329,27 +320,55 @@ const Dashboard = () => {
             <header className=" bg-white sticky top-0 p-4 shadow-md z-20">
               <div className="flex items-center justify-between">
                 {/* Always visible title */}
-                <h1 className="text-2xl font-bold text-black">
+                <h1 className="text-xl font-bold text-black">
                   Product Management System
                 </h1>
 
                 {/* Search input and add button shown on big screens (sm and up) */}
-                <div className="hidden sm:flex items-center space-x-4">
+                <div className="hidden sm:flex items-center space-x-0.5">
                   <input
                     type="text"
                     placeholder="Search Products..."
-                    className="flex-1 text-gray-500 p-2 px-4 border text-sm border-gray-300 rounded focus:outline-none focus:ring-0"
+                    className="flex-1 text-gray-500 p-2 px-4 border h-7 text-xs border-gray-300 rounded focus:outline-none focus:ring-0"
                     onChange={(e) =>
                       setSearchTerm(e.target.value.toLowerCase())
                     }
                   />
+
                   <button
-                    className="bg-blue-500 text-white px-3 py-2 rounded text-sm cursor-pointer"
+                    className="bg-blue-500 text-white px-5 rounded text-xs h-7 cursor-pointer"
                     onClick={() => {
                       openModal(null);
                     }}
                   >
                     Add Product
+                  </button>
+
+                  <button
+                    className="bg-blue-500 text-white px-5 rounded text-xs h-7 cursor-pointer"
+                    onClick={() => {
+                      NavTo("/BannerImage");
+                    }}
+                  >
+                    Banner Image
+                  </button>
+
+                  <button
+                    className="bg-blue-500 text-white px-5 rounded text-xs h-7 cursor-pointer"
+                    onClick={() => {
+                      NavTo("/Category");
+                    }}
+                  >
+                    Add Category
+                  </button>
+
+                  <button
+                    className="bg-blue-500 text-white px-5 rounded text-xs h-7 cursor-pointer"
+                    onClick={() => {
+                      NavTo("/SubCategory");
+                    }}
+                  >
+                    SubCategory
                   </button>
                 </div>
 
@@ -388,9 +407,10 @@ const Dashboard = () => {
             {/* Product List (Responsive Grid: 1 col on mobile, more on larger screens) */}
             {Object.entries(groupedProducts).map(([category], index) => (
               <div key={category} className="border p-4 rounded-lg shadow">
-                <h3 className="text-4xl mb-5 font-semibold text-white">
+                <h3 className="text-2xl mb-5 font-semibold text-white">
                   {index + 1} . {category} :
                 </h3>
+                
                 <div className="grid gap-y-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
                   {groupedProducts[category]
                     .filter(
@@ -404,7 +424,7 @@ const Dashboard = () => {
                         key={product._id}
                       >
                         <div className="bg-blue-500 text-white px-4 py-3 flex justify-between items-center">
-                          <h1 className="text-lg font-bold capitalize">
+                          <h1 className="text-xs font-bold capitalize">
                             {product.title}
                           </h1>
                           <div className="flex space-x-2">
@@ -412,25 +432,25 @@ const Dashboard = () => {
                               className="DeleteButton"
                               onClick={() => DeleteProdutFromDb(product._id)}
                             >
-                              <Trash size={15} />
+                              <Trash size={10} />
                             </button>
                             <button
                               className="EditButton"
                               onClick={() => openModal(product._id)}
                             >
-                              <UserRoundPen size={15} />
+                              <UserRoundPen size={10} />
                             </button>
                           </div>
                         </div>
                         <div className="px-4 py-3 overflow-y-auto flex-1">
-                          <p className="text-gray-700 text-sm mb-2">
+                          <p className="text-gray-700 text-xs mb-2">
                             <strong>Category:</strong> {product.category}
                           </p>
-                          <p className="text-gray-700 text-sm mb-4">
+                          <p className="text-gray-700 text-xs mb-4">
                             <strong>Description:</strong> {product.description}
                           </p>
                           <div className="mb-4">
-                            <p className="font-bold mb-2 text-sm">
+                            <p className="font-bold mb-2 text-xs">
                               Product Features:
                             </p>
                             <ul className="list-disc list-inside text-xs">
@@ -440,7 +460,7 @@ const Dashboard = () => {
                             </ul>
                           </div>
                           <div className="mb-4">
-                            <p className="font-bold mb-2 text-sm">
+                            <p className="font-bold mb-2 text-xs">
                               Product Specifications:
                             </p>
                             <div className="grid grid-cols-2 gap-1 text-xs">
@@ -456,11 +476,11 @@ const Dashboard = () => {
                               )}
                             </div>
                           </div>
-                          <p className="text-gray-700 text-sm mb-4">
+                          <p className="text-gray-700 text-xs mb-4">
                             <strong>Price:</strong> {product.price}
                           </p>
                           <div className="mb-4">
-                            <p className="font-bold mb-2 text-sm">
+                            <p className="font-bold mb-2 text-xs">
                               Image Gallery:
                             </p>
                             <div className="flex space-x-2 overflow-x-auto">
@@ -477,7 +497,7 @@ const Dashboard = () => {
                         </div>
                         <div className="bg-gray-100 flex gap-2 px-4 py-3">
                           <button
-                            className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
+                            className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-xs cursor-pointer w-full"
                             onClick={() =>
                               makeProductLiveorUnliveProdutToDb({
                                 ...product,
@@ -489,7 +509,7 @@ const Dashboard = () => {
                           </button>
 
                           <button
-                            className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-sm cursor-pointer w-full"
+                            className="bg-green-600 hover:bg-green-400 text-white font-bold py-1 px-4 rounded-full text-xs cursor-pointer w-full"
                             onClick={() =>
                               makeProductLiveorUnliveProdutToDb({
                                 ...product,
@@ -518,6 +538,8 @@ const Dashboard = () => {
                     </h2>
                     <XIcon onClick={closeModal} className="cursor-pointer" />
                   </div>
+
+
                   <form className="text-wrap" onSubmit={handleSubmit}>
                     {/* Product Title */}
                     <div className="mb-4">
@@ -537,48 +559,52 @@ const Dashboard = () => {
                         required
                       />
                     </div>
+
                     {/* Category */}
                     <div className="mb-4">
                       <label
                         htmlFor="category"
                         className="block text-gray-700 text-sm"
                       >
-                        Category
+                        Main Category
                       </label>
                       <select
                         id="category"
-                        value={formData.category}
+                        value={formData.maincategory}
                         onChange={handleInputChange}
                         className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
                         required
                       >
-                        <option value="">Select a category...</option>
-                        <option value="T-shirt">T-shirt</option>
-                        <option value="Shirt">Shirt</option>
-                        <option value="Pants">Pants</option>
-                        <option value="Jeans">Jeans</option>
-                        <option value="Electronic Gadgets">
-                          Electronic Gadgets
-                        </option>
-                        <option value="Track Suit">Track Suit</option>
-                        <option value="Luggage">Luggage</option>
-                        <option value="Trophies">Trophies</option>
-                        <option value="Jackets">Jackets</option>
-                        <option value="Bags">Bags</option>
-                        <option value="Table desk">Table desk</option>
-                        <option value="Joining kits">Joining kits</option>
-                        <option value="Desktop accessories">
-                          Desktop accessories
-                        </option>
-                        <option value="Drinkware & Kitchenware">
-                          Drinkware & Kitchenware
-                        </option>
-                        <option value="Festival">Festival</option>
-                        <option value="Corporate Gift">Corporate Gift</option>
-                        <option value="Personalized & Custom Gifts">
-                          Personalized & Custom Gifts
-                        </option>
-                        <option value="Others">Others</option>
+                        <option value="">Select a Main category...</option>
+                        {MainCategory.map((category, index) => (
+                          <option key={index} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Category */}
+                    <div className="mb-4">
+                      <label
+                        htmlFor="subcategory"
+                        className="block text-gray-700 text-sm"
+                      >
+                        Sub Category
+                      </label>
+                      <select
+                        id="subcategory"
+                        value={formData.subcategory}
+                        onChange={handleInputChange}
+                        className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
+                        required
+                      >
+                        <option value="">Select a Sub category...</option>
+                        {SubCategory.map((subCat, index) => (
+                          <option key={index} value={subCat}>
+                            {subCat}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -776,6 +802,8 @@ const Dashboard = () => {
                       </button>
                     </div>
                   </form>
+
+
                 </div>
               </div>
             )}

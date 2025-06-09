@@ -8,15 +8,15 @@
     -moz-osx-font-smoothing: grayscale;
   }
   *::-webkit-scrollbar {
-    display: none !important;
+    /* display: none !important; */
   }
   *::placeholder {
     font-size: 12px;
   }
 
   .DeleteButton {
-    height: 35px;
-    width: 35px;
+    height: 25px;
+    width: 25px;
     background-color: rgb(194, 44, 44);
     display: flex;
     align-items: center;
@@ -30,8 +30,8 @@
 
   }
   .EditButton {
-    height: 35px;
-    width: 35px;
+    height: 25px;
+    width: 25px;
     background-color: rgb(38, 45, 50);
     display: flex;
     align-items: center;
