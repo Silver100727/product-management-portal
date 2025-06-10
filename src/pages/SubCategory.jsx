@@ -16,6 +16,71 @@ const SubCategory = () => {
     category: null,
   });
 
+  const [imageLinks, setimageLinks] = useState("");
+
+  const fileUpload = async (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file, file.name);
+    await axios
+      .post(
+        "https://rsgratitudegifts.com/api/routes.php?action=upload_subcategory_thumbnail",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.success) {
+          setimageLinks(res.data.fileURL.trim());
+          event.target.value = "";
+        } else {
+          event.target.value = "";
+        }
+      })
+      .catch((err) => {
+        event.target.value = "";
+      });
+  };
+
+  const fileUpload2 = async (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file, file.name);
+    await axios
+      .post(
+        "https://rsgratitudegifts.com/api/routes.php?action=upload_subcategory_thumbnail",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.success) {
+          // setimageLinks(res.data.fileURL.trim());
+          setselectedsubCategory({
+            ...selectedsubCategory,
+            category: {
+              ...selectedsubCategory.category,
+              thumbnail_image: res.data.fileURL.trim(),
+            },
+          });
+          event.target.value = "";
+        } else {
+          event.target.value = "";
+        }
+      })
+      .catch((err) => {
+        event.target.value = "";
+      });
+  };
+
   const addToDb = () => {
     axios
       .post(
@@ -23,6 +88,7 @@ const SubCategory = () => {
         {
           category_id: categoryId,
           subcategory: subcategoryName,
+          thumbnail_image: imageLinks,
         },
         {
           headers: {
@@ -50,6 +116,7 @@ const SubCategory = () => {
           id: selectedsubCategory.category?._id,
           category_id: selectedsubCategory.category?.category_id,
           subcategory: selectedsubCategory.category?.subcategory,
+          thumbnail_image: selectedsubCategory.category.thumbnail_image,
         },
         {
           headers: {
@@ -91,7 +158,7 @@ const SubCategory = () => {
         if (res.data.success) {
           getsubCategoryFromDb();
         } else {
-          alert("Category already exists.");
+          alert("something went wrong, please try again later.");
         }
       })
       .catch((err) => {});
@@ -108,10 +175,7 @@ const SubCategory = () => {
   };
   const getsubCategoryFromDb = () => {
     axios
-      .get(
-        "https://rsgratitudegifts.com/api/routes.php?action=getsubcategory",
-        {}
-      )
+      .get("https://rsgratitudegifts.com/api/routes.php?action=getsubcategory")
       .then((res) => {
         if (res.data.success) {
           setsubcategoryList(res.data.data);
@@ -131,6 +195,7 @@ const SubCategory = () => {
     getCategoryFromDb();
     getsubCategoryFromDb();
   }, []);
+
   return (
     <div className="relative h-screen bg-slate-950 ">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]" />
@@ -271,6 +336,42 @@ const SubCategory = () => {
                 </select>
               </div>
 
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm">
+                  Upload Image
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="fileInput"
+                    onChange={fileUpload}
+                    className="hidden" // Hide default file input
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("fileInput").click()}
+                    className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
+                  >
+                    Choose File
+                  </button>
+                </div>
+
+                {imageLinks && (
+                  <div className="flex items-center space-x-2 justify-between mt-2">
+                    <p className="text-blue-500 truncate">{imageLinks || ""}</p>
+                    <span
+                      className="text-red-600"
+                      onClick={() => {
+                        setimageLinks("");
+                      }}
+                    >
+                      Remove
+                    </span>
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -362,6 +463,50 @@ const SubCategory = () => {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm">
+                  Upload Image
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="fileInput"
+                    onChange={fileUpload2}
+                    className="hidden" // Hide default file input
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("fileInput").click()}
+                    className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
+                  >
+                    Choose File
+                  </button>
+                </div>
+
+                {selectedsubCategory.category?.thumbnail_image && (
+                  <div className="flex items-center space-x-2 justify-between mt-2">
+                    <p className="text-blue-500 truncate">
+                      {selectedsubCategory.category?.thumbnail_image || ""}
+                    </p>
+                    <span
+                      className="text-red-600"
+                      onClick={() => {
+                        setselectedsubCategory({
+                          ...selectedsubCategory,
+                          category: {
+                            ...selectedsubCategory.category,
+                            thumbnail_image: "",
+                          },
+                        });
+                      }}
+                    >
+                      Remove
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end">

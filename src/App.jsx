@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Authentication from "./pages/Authentication";
 import Dashboard from "./pages/Dashboard";
 import BannerImage from "./pages/BannerImage";
-import SubCategory from "./pages/SubCategory";
 import Category from "./pages/Category";
+import SubCategory from "./pages/SubCategory";
 
 const App = () => {
   return (

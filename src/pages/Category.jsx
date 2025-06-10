@@ -12,14 +12,79 @@ const Category = () => {
     isModelOpen: false,
     category: null,
   });
+  const [imageLinks, setimageLinks] = useState("");
+
+  const fileUpload = async (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file, file.name);
+    await axios
+      .post(
+        "https://rsgratitudegifts.com/api/routes.php?action=upload_category_thumbnail",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.success) {
+          setimageLinks(res.data.fileURL.trim());
+          event.target.value = "";
+        } else {
+          event.target.value = "";
+        }
+      })
+      .catch((err) => {
+        event.target.value = "";
+      });
+  };
+
+  const fileUpload2 = async (event) => {
+    event.preventDefault();
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file, file.name);
+    await axios
+      .post(
+        "https://rsgratitudegifts.com/api/routes.php?action=upload_category_thumbnail",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => {
+        if (res.data.success) {
+          setselectedCategory({
+            ...selectedCategory,
+            category: {
+              ...selectedCategory.category,
+              thumbnail_image: res.data.fileURL.trim(),
+            },
+          });
+
+          // setimageLinks(res.data.fileURL.trim());
+          event.target.value = "";
+        } else {
+          event.target.value = "";
+        }
+      })
+      .catch((err) => {
+        event.target.value = "";
+      });
+  };
 
   const addToDb = () => {
-    console.log("hii");
     axios
       .post(
         "https://rsgratitudegifts.com/api/routes.php?action=addcategory",
         {
           category: categoryName,
+          thumbnail_image: imageLinks,
         },
         {
           headers: {
@@ -45,6 +110,7 @@ const Category = () => {
         {
           id: selectedCategory.category._id,
           category: selectedCategory.category.category,
+          thumbnail_image: selectedCategory.category.thumbnail_image,
         },
         {
           headers: {
@@ -112,6 +178,8 @@ const Category = () => {
   useEffect(() => {
     getCategoryFromDb();
   }, []);
+
+  console.log("selectedCategory", selectedCategory);
 
   return (
     <div className="relative h-screen bg-slate-950 ">
@@ -222,6 +290,42 @@ const Category = () => {
                 />
               </div>
 
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm">
+                  Upload Image
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="fileInput"
+                    onChange={fileUpload}
+                    className="hidden" // Hide default file input
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("fileInput").click()}
+                    className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
+                  >
+                    Choose File
+                  </button>
+                </div>
+
+                {imageLinks && (
+                  <div className="flex items-center space-x-2 justify-between mt-2">
+                    <p className="text-blue-500 truncate">{imageLinks || ""}</p>
+                    <span
+                      className="text-red-600"
+                      onClick={() => {
+                        setimageLinks("");
+                      }}
+                    >
+                      Remove
+                    </span>
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -270,7 +374,7 @@ const Category = () => {
                   type="text"
                   id="title"
                   placeholder="Category Title..."
-                  value={selectedCategory.category?.subcategory}
+                  value={selectedCategory.category?.category}
                   onChange={(e) => {
                     setselectedCategory({
                       ...selectedCategory,
@@ -283,6 +387,50 @@ const Category = () => {
                   className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
                   required
                 />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm">
+                  Upload Image
+                </label>
+                <div className="flex items-center">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="fileInput"
+                    onChange={fileUpload2}
+                    className="hidden" // Hide default file input
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("fileInput").click()}
+                    className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
+                  >
+                    Choose File
+                  </button>
+                </div>
+
+                {selectedCategory.category?.thumbnail_image && (
+                  <div className="flex items-center space-x-2 justify-between mt-2">
+                    <p className="text-blue-500 truncate">
+                      {selectedCategory.category?.thumbnail_image || ""}
+                    </p>
+                    <span
+                      className="text-red-600"
+                      onClick={() => {
+                        setselectedCategory({
+                          ...selectedCategory,
+                          category: {
+                            ...selectedCategory.category,
+                            thumbnail_image: "",
+                          },
+                        });
+                      }}
+                    >
+                      Remove
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end">
