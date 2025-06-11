@@ -590,7 +590,7 @@ const Dashboard = () => {
                         Main Category
                       </label>
                       <select
-                        id="maincategory"
+                        id="category"
                         value={formData.category}
                         onChange={(e) => {
                           handleInputChange(e);
