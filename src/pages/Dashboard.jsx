@@ -10,7 +10,7 @@ const UploadURL =
 const initialFormData = {
   title: "",
   description: "",
-  maincategory: "",
+  category: "",
   subcategory: "",
   price: "",
   features: [],
@@ -39,15 +39,11 @@ const Dashboard = () => {
   const [showHeaderContent, setShowHeaderContent] = useState(false);
 
   // Open the modal to add or edit a product.
-  const openModal = (id) => {
+  const openModal = (product) => {
     setIsModalOpen(true);
-    setEditIndex(id);
-    if (id) {
-      const flatProducts = Object.values(groupedProducts)
-        .flatMap((products) => products)
-        .find((item) => item._id == id);
-      console.log(flatProducts);
-      setFormData(flatProducts);
+    setEditIndex(product._id);
+    if (product) {
+      setFormData(product);
     } else {
       setFormData(initialFormData);
     }
@@ -133,6 +129,7 @@ const Dashboard = () => {
           type: "add",
           title: formData.title,
           category: formData.category,
+          subcategory: formData.subcategory,
           description: formData.description,
           features: formData.features,
           specification: formData.specification,
@@ -166,6 +163,7 @@ const Dashboard = () => {
           id: formData._id,
           title: formData.title,
           category: formData.category,
+          subcategory: formData.subcategory,
           description: formData.description,
           features: formData.features,
           specification: formData.specification,
@@ -300,7 +298,6 @@ const Dashboard = () => {
         event.target.value = "";
       });
   };
-
   const getCategoryFromDb = () => {
     axios
       .get("https://rsgratitudegifts.com/api/routes.php?action=getcategory", {})
@@ -461,7 +458,7 @@ const Dashboard = () => {
                             </button>
                             <button
                               className="EditButton"
-                              onClick={() => openModal(product._id)}
+                              onClick={() => openModal(product)}
                             >
                               <UserRoundPen size={10} />
                             </button>
@@ -594,7 +591,7 @@ const Dashboard = () => {
                       </label>
                       <select
                         id="maincategory"
-                        value={formData.maincategory}
+                        value={formData.category}
                         onChange={(e) => {
                           handleInputChange(e);
                           getsubCategoryFromDb(e.target.value);
