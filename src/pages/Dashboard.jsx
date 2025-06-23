@@ -145,12 +145,8 @@ const Dashboard = () => {
         }
       )
       .then((res) => {
-        if (res.data.success) {
-          alert("Product added successfully!");
-          fetchProdutFromDb();
-        } else {
-          alert("Product already exists.");
-        }
+        alert("Product added successfully!");
+        fetchProdutFromDb();
       })
       .catch((err) => {});
   };
