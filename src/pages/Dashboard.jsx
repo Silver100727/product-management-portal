@@ -40,12 +40,14 @@ const Dashboard = () => {
 
   // Open the modal to add or edit a product.
   const openModal = (product) => {
+    console.log("hello", product);
     setIsModalOpen(true);
-    setEditIndex(product._id);
     if (product) {
       setFormData(product);
+      getsubCategoryFromDb(product.category);
     } else {
       setFormData(initialFormData);
+      setEditIndex(product._id);
     }
     setImageLinkInput("");
     setFeatureInput("");
@@ -247,6 +249,7 @@ const Dashboard = () => {
           price: p.price,
           imageLinks: p.imageLinks,
           isLive: p.isLive,
+          subcategory: p.subcategory,
           isTrending: p.isTrending,
         },
         {
@@ -328,6 +331,7 @@ const Dashboard = () => {
     fetchProdutFromDb();
     getCategoryFromDb();
   }, []);
+
 
   return (
     <>
