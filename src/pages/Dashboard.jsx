@@ -40,14 +40,13 @@ const Dashboard = () => {
 
   // Open the modal to add or edit a product.
   const openModal = (product) => {
-    console.log("hello", product);
     setIsModalOpen(true);
     if (product) {
       setFormData(product);
       getsubCategoryFromDb(product.category);
+      setEditIndex(product._id);
     } else {
       setFormData(initialFormData);
-      setEditIndex(product._id);
     }
     setImageLinkInput("");
     setFeatureInput("");
@@ -205,7 +204,6 @@ const Dashboard = () => {
             return acc;
           }, {});
 
-          console.log("groupedProducts", groupedProducts);
           setgroupedProducts(groupedProducts);
         }
       })
@@ -331,7 +329,6 @@ const Dashboard = () => {
     fetchProdutFromDb();
     getCategoryFromDb();
   }, []);
-
 
   return (
     <>
