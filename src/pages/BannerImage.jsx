@@ -18,7 +18,7 @@ const BannerImage = () => {
     formData.append("image", file, file.name);
     await axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=upload_banner",
+        "https://rsglobalsolutions.in/api/routes.php?action=upload_banner",
         formData,
         {
           headers: {
@@ -52,7 +52,7 @@ const BannerImage = () => {
     console.log("selectedBanner", selectedBanner);
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=addbanner",
+        "https://rsglobalsolutions.in/api/routes.php?action=addbanner",
         {
           type: "update",
           id: selectedBanner.banner._id,
@@ -78,7 +78,7 @@ const BannerImage = () => {
   };
   const getBannerFromDb = () => {
     axios
-      .post("https://rsgratitudegifts.com/api/routes.php?action=addbanner", {
+      .post("https://rsglobalsolutions.in/api/routes.php?action=addbanner", {
         type: "get",
       })
       .then((res) => {

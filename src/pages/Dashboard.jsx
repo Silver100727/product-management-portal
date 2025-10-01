@@ -3,9 +3,9 @@ import { Menu, Trash, UserRoundPen, X, XIcon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const BaseUrl = "https://rsgratitudegifts.com/api/routes.php?action=addproduct";
+const BaseUrl = "https://rsglobalsolutions.in/api/routes.php?action=addproduct";
 const UploadURL =
-  "https://rsgratitudegifts.com/api/routes.php?action=upload_image";
+  "https://rsglobalsolutions.in/api/routes.php?action=upload_image";
 
 const initialFormData = {
   title: "",
@@ -268,7 +268,7 @@ const Dashboard = () => {
     formData.append("image", file, file.name);
     await axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=upload_image",
+        "https://rsglobalsolutions.in/api/routes.php?action=upload_image",
         formData,
         {
           headers: {
@@ -297,7 +297,7 @@ const Dashboard = () => {
   };
   const getCategoryFromDb = () => {
     axios
-      .get("https://rsgratitudegifts.com/api/routes.php?action=getcategory", {})
+      .get("https://rsglobalsolutions.in/api/routes.php?action=getcategory", {})
       .then((res) => {
         if (res.data.success) {
           setMainCategory(res.data.data);
@@ -310,7 +310,7 @@ const Dashboard = () => {
   const getsubCategoryFromDb = (name) => {
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=getsubcategorybycategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=getsubcategorybycategory",
         {
           category_id: MainCategory.find((c) => c.category == name)?._id || "",
         }

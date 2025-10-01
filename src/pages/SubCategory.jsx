@@ -25,7 +25,7 @@ const SubCategory = () => {
     formData.append("image", file, file.name);
     await axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=upload_subcategory_thumbnail",
+        "https://rsglobalsolutions.in/api/routes.php?action=upload_subcategory_thumbnail",
         formData,
         {
           headers: {
@@ -53,7 +53,7 @@ const SubCategory = () => {
     formData.append("image", file, file.name);
     await axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=upload_subcategory_thumbnail",
+        "https://rsglobalsolutions.in/api/routes.php?action=upload_subcategory_thumbnail",
         formData,
         {
           headers: {
@@ -84,7 +84,7 @@ const SubCategory = () => {
   const addToDb = () => {
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=addsubcategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=addsubcategory",
         {
           category_id: categoryId,
           subcategory: subcategoryName,
@@ -111,7 +111,7 @@ const SubCategory = () => {
   const UpdateToDb = () => {
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=editsubcategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=editsubcategory",
         {
           id: selectedsubCategory.category?._id,
           category_id: selectedsubCategory.category?.category_id,
@@ -144,7 +144,7 @@ const SubCategory = () => {
     }
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=deletesubcategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=deletesubcategory",
         {
           id: id,
         },
@@ -165,7 +165,7 @@ const SubCategory = () => {
   };
   const getCategoryFromDb = () => {
     axios
-      .get("https://rsgratitudegifts.com/api/routes.php?action=getcategory", {})
+      .get("https://rsglobalsolutions.in/api/routes.php?action=getcategory", {})
       .then((res) => {
         if (res.data.success) {
           setcategoryList(res.data.data);
@@ -175,7 +175,7 @@ const SubCategory = () => {
   };
   const getsubCategoryFromDb = () => {
     axios
-      .get("https://rsgratitudegifts.com/api/routes.php?action=getsubcategory")
+      .get("https://rsglobalsolutions.in/api/routes.php?action=getsubcategory")
       .then((res) => {
         if (res.data.success) {
           setsubcategoryList(res.data.data);

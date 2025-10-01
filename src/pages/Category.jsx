@@ -21,7 +21,7 @@ const Category = () => {
     formData.append("image", file, file.name);
     await axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=upload_category_thumbnail",
+        "https://rsglobalsolutions.in/api/routes.php?action=upload_category_thumbnail",
         formData,
         {
           headers: {
@@ -49,7 +49,7 @@ const Category = () => {
     formData.append("image", file, file.name);
     await axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=upload_category_thumbnail",
+        "https://rsglobalsolutions.in/api/routes.php?action=upload_category_thumbnail",
         formData,
         {
           headers: {
@@ -81,7 +81,7 @@ const Category = () => {
   const addToDb = () => {
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=addcategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=addcategory",
         {
           category: categoryName,
           thumbnail_image: imageLinks,
@@ -106,7 +106,7 @@ const Category = () => {
   const UpdateToDb = () => {
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=editcategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=editcategory",
         {
           id: selectedCategory.category._id,
           category: selectedCategory.category.category,
@@ -138,7 +138,7 @@ const Category = () => {
     }
     axios
       .post(
-        "https://rsgratitudegifts.com/api/routes.php?action=deletecategory",
+        "https://rsglobalsolutions.in/api/routes.php?action=deletecategory",
         {
           id: id,
         },
@@ -159,7 +159,7 @@ const Category = () => {
   };
   const getCategoryFromDb = () => {
     axios
-      .get("https://rsgratitudegifts.com/api/routes.php?action=getcategory", {})
+      .get("https://rsglobalsolutions.in/api/routes.php?action=getcategory", {})
       .then((res) => {
         if (res.data.success) {
           setcategoryList(res.data.data);
