@@ -1,23 +1,66 @@
 import axios from "axios";
 import { ArrowBigLeft, Edit2, XIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 const BannerImage = () => {
   const NavTo = useNavigate();
+  const fileInputRef = useRef(null);
   const [ListBannedImg, setListBannedImg] = useState([]);
   const [selectedBanner, setselectedBanner] = useState({
     isOpen: false,
     banner: null,
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const fileUpload = async (event) => {
+  const getBannerFromDb = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.post(
+        "https://rsglobalsolutions.in/api/routes.php?action=addbanner",
+        { type: "get" }
+      );
+
+      if (res.data.success) {
+        setListBannedImg(res.data.data);
+      }
+    } catch (err) {
+      console.error("Fetch banners error:", err);
+      alert("Error loading banners. Please refresh the page.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const fileUpload = useCallback(async (event) => {
     event.preventDefault();
     const file = event.target.files[0];
+
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      alert("Please upload a valid image file (JPEG, PNG, GIF, or WebP)");
+      event.target.value = "";
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("File size must be less than 5MB");
+      event.target.value = "";
+      return;
+    }
+
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("image", file, file.name);
-    await axios
-      .post(
+
+    try {
+      const res = await axios.post(
         "https://rsglobalsolutions.in/api/routes.php?action=upload_banner",
         formData,
         {
@@ -25,33 +68,37 @@ const BannerImage = () => {
             "Content-Type": "multipart/form-data",
           },
         }
-      )
-      .then((res) => {
-        if (res.data.success) {
-          if (res.data.fileURL.trim() === "") return;
-          setselectedBanner((prevBanner) => ({
-            ...prevBanner,
-            banner: {
-              ...prevBanner.banner,
-              imageLinks: [
-                ...prevBanner.banner.imageLinks,
-                res.data.fileURL.trim(),
-              ],
-            },
-          }));
-          event.target.value = "";
-        } else {
-          event.target.value = "";
-        }
-      })
-      .catch((err) => {
-        event.target.value = "";
-      });
-  };
-  const UpdateToDb = () => {
-    console.log("selectedBanner", selectedBanner);
-    axios
-      .post(
+      );
+
+      if (res.data.success && res.data.fileURL.trim() !== "") {
+        setselectedBanner((prevBanner) => ({
+          ...prevBanner,
+          banner: {
+            ...prevBanner.banner,
+            imageLinks: [
+              ...prevBanner.banner.imageLinks,
+              res.data.fileURL.trim(),
+            ],
+          },
+        }));
+      } else {
+        alert("Failed to upload image. Please try again.");
+      }
+    } catch (err) {
+      console.error("Image upload error:", err);
+      alert(
+        "Error uploading image. Please check your connection and try again."
+      );
+    } finally {
+      event.target.value = "";
+      setIsUploading(false);
+    }
+  }, []);
+
+  const UpdateToDb = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.post(
         "https://rsglobalsolutions.in/api/routes.php?action=addbanner",
         {
           type: "update",
@@ -64,35 +111,34 @@ const BannerImage = () => {
             "Content-Type": "application/json",
           },
         }
-      )
-      .then((res) => {
-        if (res.data.success) {
-          alert("Banner added successfully!");
-          setselectedBanner({ isOpen: false, banner: null });
-          getBannerFromDb();
-        } else {
-          alert("Banner already exists.");
-        }
-      })
-      .catch((err) => {});
-  };
-  const getBannerFromDb = () => {
-    axios
-      .post("https://rsglobalsolutions.in/api/routes.php?action=addbanner", {
-        type: "get",
-      })
-      .then((res) => {
-        if (res.data.success) {
-          setListBannedImg(res.data.data);
-        }
-      })
-      .catch((err) => {});
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    UpdateToDb();
-  };
-  const handleRemoveImageLink = (index) => {
+      );
+
+      if (res.data.success) {
+        alert("Banner updated successfully!");
+        setselectedBanner({ isOpen: false, banner: null });
+        await getBannerFromDb();
+      } else {
+        alert("Failed to update banner. Please try again.");
+      }
+    } catch (err) {
+      console.error("Update banner error:", err);
+      alert(
+        "Error updating banner. Please check your connection and try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedBanner, getBannerFromDb]);
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      await UpdateToDb();
+    },
+    [UpdateToDb]
+  );
+
+  const handleRemoveImageLink = useCallback((index) => {
     setselectedBanner((prevBanner) => ({
       ...prevBanner,
       banner: {
@@ -100,10 +146,11 @@ const BannerImage = () => {
         imageLinks: prevBanner.banner.imageLinks.filter((_, i) => i !== index),
       },
     }));
-  };
+  }, []);
+
   useEffect(() => {
     getBannerFromDb();
-  }, []);
+  }, [getBannerFromDb]);
 
   return (
     <div className="relative h-screen bg-slate-950 ">
@@ -128,11 +175,17 @@ const BannerImage = () => {
           </div>
         </header>
 
+        {isLoading && (
+          <div className="flex justify-center items-center p-5">
+            <p className="text-white text-lg">Loading banners...</p>
+          </div>
+        )}
+
         <div className="grid gap-3 p-5 mt-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
           {ListBannedImg.map((banner) => {
             return (
               <div
-                key={banner.id}
+                key={banner._id}
                 className="bg-white z-10 p-4 rounded-lg shadow-md mb-4"
               >
                 <div className="flex justify-between items-center mb-2">
@@ -145,7 +198,7 @@ const BannerImage = () => {
                       });
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
-                    title="Edit Category"
+                    title="Edit Banner"
                   >
                     <Edit2 size={10} />
                   </button>
@@ -156,7 +209,8 @@ const BannerImage = () => {
                     <img
                       key={index}
                       src={link}
-                      alt={link}
+                      alt={`${banner.banner_type} ${index + 1}`}
+                      loading="lazy"
                       className="w-[100px] h-[50px] object-cover mb-2"
                     />
                   ))}
@@ -188,20 +242,12 @@ const BannerImage = () => {
                 >
                   Banner Title
                 </label>
-                <select
+                <input
                   id="category"
+                  disabled
                   value={selectedBanner.banner.banner_type}
                   className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-0"
-                  required
-                >
-                  {["MainBanner", "CoporateBanner", "FestivalBanner"].map(
-                    (Banner, index) => (
-                      <option key={index} value={Banner}>
-                        {Banner}
-                      </option>
-                    )
-                  )}
-                </select>
+                ></input>
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm">
@@ -211,16 +257,17 @@ const BannerImage = () => {
                   <input
                     type="file"
                     accept="image/*"
-                    id="fileInput"
+                    ref={fileInputRef}
                     onChange={fileUpload}
-                    className="hidden" // Hide default file input
+                    className="hidden"
                   />
                   <button
                     type="button"
-                    onClick={() => document.getElementById("fileInput").click()}
+                    onClick={() => fileInputRef.current?.click()}
                     className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
+                    disabled={isUploading}
                   >
-                    Choose File
+                    {isUploading ? "Uploading..." : "Choose File"}
                   </button>
                 </div>
 
@@ -261,14 +308,16 @@ const BannerImage = () => {
                     setselectedBanner({ isOpen: false, banner: null });
                   }}
                   className="bg-gray-500 text-white px-3 py-2 text-sm rounded mr-2 cursor-pointer"
+                  disabled={isLoading}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer"
+                  className="bg-blue-500 text-white px-3 py-2 text-sm rounded cursor-pointer disabled:bg-blue-300 disabled:cursor-not-allowed"
+                  disabled={isLoading || isUploading}
                 >
-                  Save
+                  {isLoading ? "Saving..." : "Save"}
                 </button>
               </div>
             </form>
